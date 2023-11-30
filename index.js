@@ -24,6 +24,7 @@ async function run() {
     await client.connect();
 
     const biodataCollection = client.db('biodataDB').collection('biodata')
+    const biodataFavCollection = client.db('biodataDB').collection('biodataFav')
 
     app.post('/biodatas', async (req, res) => {
       const newBiodata = req.body
@@ -39,6 +40,38 @@ async function run() {
         const result = await biodataCollection.insertOne(newUser)
         res.send(result)
       }
+    })
+
+    app.get('/biodatas', async (req, res) => {
+      const cursor = biodataCollection.find()
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+
+    app.get('/biodatas/:id', async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await biodataCollection.findOne(query)
+      res.send(result)
+    })
+
+    app.get('/favourites', async (req, res) => {
+      const cursor = biodataFavCollection.find()
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+
+    app.post('/favourites', async (req, res) => {
+      const newRequest = req.body
+      const result = await biodataFavCollection.insertOne(newRequest)
+      res.send(result)
+    })
+
+    app.delete('/favourites/:id', async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await biodataFavCollection.deleteOne(query)
+      res.send(result)
     })
 
     // Send a ping to confirm a successful connection
